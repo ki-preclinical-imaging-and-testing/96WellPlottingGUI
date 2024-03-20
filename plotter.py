@@ -190,19 +190,29 @@ def get_y_axis_options():
 
 	# Add buttons for y-axis data like smoothing and error bars #
 
-	app.viewing = ctk.StringVar(value = '')
-	options = [column for column in app.df.columns]
-	drop = ctk.CTkOptionMenu(master=plot_frame,variable=app.viewing,values=options)
-	drop.configure(width=200)
-	drop.place(relx=0.2, rely=0.05, anchor='center')
+	if app.first_plot == True:
 
-	smooth_button = ctk.CTkCheckBox(master=plot_frame, text='Moving Average',
-		variable=app.smooth_data, onvalue='on', offvalue='off')
-	error_bars_button = ctk.CTkCheckBox(master=plot_frame, text='Error Bars',
-		variable=app.error_bars, onvalue='on', offvalue='off')
+		smooth_button = ctk.CTkCheckBox(master=plot_frame, text='Moving Average',
+			variable=app.smooth_data, onvalue='on', offvalue='off')
+		error_bars_button = ctk.CTkCheckBox(master=plot_frame, text='Error Bars',
+			variable=app.error_bars, onvalue='on', offvalue='off')
 
-	smooth_button.place(relx=0.5, rely=0.05, anchor='center')
-	error_bars_button.place(relx=0.7,rely=0.05,anchor='center')
+		smooth_button.place(relx=0.5, rely=0.05, anchor='center')
+		error_bars_button.place(relx=0.7,rely=0.05,anchor='center')	
+		app.viewing = ctk.StringVar(value = '')
+		options = [column for column in app.df.columns]
+		app.drop = ctk.CTkOptionMenu(master=plot_frame,variable=app.viewing,values=options)
+		app.drop.configure(width=200)
+		app.drop.place(relx=0.2, rely=0.05, anchor='center')
+
+		app.first_plot = False
+
+	if app.first_plot == False:
+
+		print('just updating options')
+		options = [column for column in app.df.columns]
+		app.drop.configure(values=options)
+
 
 # GUI Interactive Functions
 def LabelWell(event):
@@ -257,9 +267,9 @@ def DisplayPlot():
 
 	# Redraw the plot with current selections #
 
-	fig = Figure(figsize=(7,5),dpi=100)
+	app.fig = Figure(figsize=(7,5),dpi=100)
 	plt.style.use('dark_background')
-	plot1 = fig.add_subplot(111)
+	plot1 = app.fig.add_subplot(111)
 
 	if hasattr(app,'df'):
 
@@ -269,7 +279,7 @@ def DisplayPlot():
 		moving_average_bool = (app.smooth_data.get() == 'on')
 		error_bars = (app.error_bars.get() == 'on')
 		included = app.visualized_wells
-		y_lims = [np.round(app.df[outcome].min()*0.95,2),np.round(app.df[outcome].max()*1.05,2)]
+		#y_lims = [app.df[outcome].min()*0.95,app.df[outcome].max()*1.05]
 		myFmt = mdates.DateFormatter('%H:%M')
 
 		create_plot(app.df,labels_to_view,outcome,moving_average_bool,error_bars,included,plot1)
@@ -277,18 +287,27 @@ def DisplayPlot():
 		plot1.xaxis.set_major_formatter(myFmt)
 		plot1.set_title(outcome)
 		plot1.set_xlabel('Time (Hours:Min)')
-		plot1.set_ylim(y_lims)
+		#plot1.set_ylim(y_lims)
 
-		fig.tight_layout()
+		app.fig.tight_layout()
 	else:
 		outcome = 'Random Plot'
 		y = [0,4,5,3,7,6,8,1,2,3,4,2,1]
 		plot1.scatter(range(0,len(y)),y)
 		plot1.set_title(outcome)
 
-	canvas = FigureCanvasTkAgg(fig, master = plot_frame)
+	canvas = FigureCanvasTkAgg(app.fig, master = plot_frame)
 	canvas.draw()
 	canvas.get_tk_widget().place(relx = 0.5, rely = 0.5, anchor='center')
+
+	save_button = ctk.CTkButton(plot_frame, text = 'Save plot', command = SavePlot)
+	save_button.place(relx=0.6,rely=0.85)
+
+def SavePlot():
+	plot_savename = ctk.filedialog.asksaveasfile(filetypes=[("img file",".png")],defaultextension='.png')
+	if not plot_savename:
+		return
+	app.fig.savefig(plot_savename.name)
 
 app = ctk.CTk()
 ctk.set_appearance_mode("dark")
@@ -336,9 +355,10 @@ WellPickerGroupButton.place(relx=0.8, rely=0.8, anchor='w')
 # Adding basic functionality buttons
 upload_button = ctk.CTkButton(top_frame,text = 'Upload csv file', command=GetDataPath)
 upload_button.grid(row=1, column=1)
+app.first_plot = True
 
 display_button = ctk.CTkButton(plot_frame,text = 'Display plot', command = DisplayPlot)
-display_button.place(relx=0.4,rely=0.85)
+display_button.place(relx=0.3,rely=0.85)
 
 exit_button = ctk.CTkButton(top_frame,text = 'Close', command = exit)
 exit_button.grid(row=1,column=5,sticky='e')
