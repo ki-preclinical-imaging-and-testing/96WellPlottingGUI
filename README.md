@@ -19,7 +19,7 @@ pyinstaller plotter.py --onefile --icon="icon.ico" --name 96WellPlotter
 ```
 Windows:
 ```
-pyton3 -m PyInstaller plotter.py --onefile --icon="icon.ico" --name 96WellPlotter
+python3 -m PyInstaller plotter.py --onefile --icon="icon.ico" --name 96WellPlotter
 ```
 
 The application will be located at /dist/96WellPlotter in the 96WellPlottingGUI folder
