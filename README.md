@@ -12,6 +12,7 @@ pip install pyinstaller
 ```
 2. Navigate to the 96WellPlottingGUI folder
 3. In the folder, run the following
+
 MacOS:
 ```
 pyinstaller plotter.py --onefile --icon="icon.ico" --name 96WellPlotter
