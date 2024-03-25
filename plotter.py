@@ -58,6 +58,7 @@ def create_plot(df, labels_to_view, outcome, moving_average_bool, error_bars, in
 		means = []
 		meds = []
 		stds = []
+		sems = []
 		lower_qrt = []
 		upper_qrt = []
 		times = []
@@ -80,10 +81,12 @@ def create_plot(df, labels_to_view, outcome, moving_average_bool, error_bars, in
 
 			if len(values_to_plot)>1:
 				stds.append(values_to_plot.std())
+				sems.append(values_to_plot.std()/np.sqrt(len(values_to_plot)))
 				lower_qrt.append(values_to_plot.quantile(q=0.25))
 				upper_qrt.append(values_to_plot.quantile(q=0.75))
 			else:
 				stds.append(0)
+				sems.append(0)
 				lower_qrt.append(values_to_plot.median())
 				upper_qrt.append(values_to_plot.median())
 
@@ -95,10 +98,10 @@ def create_plot(df, labels_to_view, outcome, moving_average_bool, error_bars, in
 			plot1.scatter(times,means,label=well)
 		if error_bars:
 			if not moving_average_bool:
-				plot1.errorbar(times, means, yerr=np.array(stds))
+				plot1.errorbar(times, means, yerr=np.array(sems))
 			else:
-				lower = movingaverage(np.array(means) - np.array(stds),5)
-				upper = movingaverage(np.array(means) + np.array(stds),5)
+				lower = movingaverage(np.array(means) - np.array(sems),5)
+				upper = movingaverage(np.array(means) + np.array(sems),5)
 				plot1.fill_between(times[2:-2], upper[2:-2],lower[2:-2],alpha=0.2)
 				#plot1.fill_between(times, upper_qrt,lower_qrt,alpha=0.2)
 				
