@@ -1,7 +1,27 @@
-This python GUI can be used to interact with csv files to plot 96-well plot data
+# Description
+This is a simple python GUI that can be used to interact with csv files to plot 96-well plot data
 
-This requires the use of the following packages:
-pandas, customtkinter, matplotlib
+# Dependencies
+This requires a pip install of the following packages:
+datetime, pandas, customtkinter, matplotlib
+
+# For a stand alone application
+1. Download pyinstaller
+```
+pip install pyinstaller
+```
+2. Navigate to the 96WellPlottingGUI folder
+3. In the folder, run the following
+MacOS:
+```
+pyinstaller plotter.py --onefile --icon="icon.ico" --name 96WellPlotter
+```
+Windows:
+```
+pyton3 -m PyInstaller plotter.py --onefile --icon="icon.ico" --name 96WellPlotter
+```
+
+The application will be located at /dist/96WellPlotter in the 96WellPlottingGUI folder
 
 A screenshot of the window can be seen below:
 
